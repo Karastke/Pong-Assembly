@@ -6,6 +6,7 @@ DATA SEGMENT PARA 'DATA' ;데이터를 저장하는 segment
 
     BALL_X DW 0Ah
     BALL_Y DW 0Ah
+    BALL_SIZE DW 04h ;size of the ball
 
 DATA ENDS
 
@@ -39,12 +40,29 @@ CODE SEGMENT PARA 'CODE'
 
     DRAW_BALL PROC NEAR 
 
-        MOV AH, 0Ch ;set the configuration to writing a pixel
-        MOV AL, 0Fh ;choose white as color
-        MOV BH, 00h ;set the page number
         MOV CX, BALL_X ;set the column (X 축)
         MOV DX, BALL_Y ;set the line (Y 축)
-        INT 10h     ;execute the configuration
+
+        DRAW_BALL_HORIZONTAL:
+            MOV AH, 0Ch ;set the configuration to writing a pixel
+            MOV AL, 0Fh ;choose white as color
+            MOV BH, 00h ;set the page number
+            INT 10h     ;execute the configuration
+            
+            INC CX      ;CX = CX + 1
+            MOV AX,CX
+            SUB AX,BALL_X
+            CMP AX,BALL_SIZE
+            JNG DRAW_BALL_HORIZONTAL
+            
+            MOV CX,BALL_X
+            INC DX
+            
+            MOV AX,DX
+            SUB AX,BALL_Y
+            CMP AX,BALL_SIZE
+            JNG DRAW_BALL_HORIZONTAL
+
 
         RET
     DRAW_BALL ENDP
